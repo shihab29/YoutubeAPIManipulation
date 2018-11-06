@@ -1,0 +1,69 @@
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+  
+  <body onload="$('#area1').val('')">
+    
+  <input type="text"  value="" 
+  id="searchtext1" size="75">&nbsp;
+  <button onclick="getVids()">Get Items</button>
+  <br><br> 
+ <input type="button" value="Clear" onclick="javascript:eraseText();"> </br>  
+  <textarea id="area1" style="width:100%;height:590px">
+  <img id="image" src="" >
+  </textarea>
+  
+  <script>
+  
+  sum = 0;
+sumN = 1;
+var nextPageToken;
+
+function getVids(PageToken){
+    pid = $('#searchtext1').val();
+    $.get(
+        "https://www.googleapis.com/youtube/v3/playlistItems",{
+        part : 'snippet', 
+		channelId : 'UCTiKg8x993HJoBYfGtMl5AQ',
+		eventType : 'live',
+        maxResults : 50,
+        playlistId : pid,
+        pageToken : PageToken,
+        key: 'AIzaSyD0vbkB2PDmQT_VAlTUvPws194gKR-ntog'
+        },
+        function(data){
+              myPlan(data);
+        }        
+    );  
+ }
+
+  function myPlan(data){
+      total = data.pageInfo.totalResults+1;
+      nextPageToken=data.nextPageToken;
+      for(i=0;i<data.items.length;i++){
+          sum++ ; sumN++;
+		  
+		  //When thumbnails are needs remove the comment
+		  //document.getElementById('area1').value += data.items[i].snippet.thumbnails.default.url +'\n';
+		  
+		  document.getElementById('area1').value += '<li class="vid-src-changer-li"><button class="vid-src-changer" data-thumburl="https://i.ytimg.com/vi/l2WHeQP6y9s/default.jpg" data-vidsrcvalue="https://www.youtube.com/embed/'+data.items[i].snippet.resourceId.videoId+'?rel=0&autoplay=1&enablejsapi=1">'+data.items[i].snippet.title+'</button></li>\n';
+          if(sum == (total-1) ){              
+              sum = 0;  
+              return;      
+          }
+      }  
+      if(sum <(total-1)){
+          getVids(nextPageToken);
+      }    
+ }
+ 
+ function init(){
+    $('#area1').val('');
+ }
+ 
+ function eraseText() {
+    document.getElementById("area1").value = "";
+	sumN=1;
+}
+  
+  </script>
